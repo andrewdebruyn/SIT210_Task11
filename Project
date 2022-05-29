@@ -1,0 +1,37 @@
+import smbus
+import time
+ # Get I2C bus
+bus = smbus.SMBus(1)
+bus.write_byte_data(0x38, 0x41, 0x00)
+bus.write_byte_data(0x38, 0x42, 0x90)
+bus.write_byte_data(0x38, 0x44, 0x02)
+ time.sleep(0.5)
+ # BH1745NUC address 0x38(56)Read data back from 0x50(80), 8 bytes
+# Red LSB, Red MSB, Green LSB, Green MSB, Blue LSB, Blue MSB
+# cData LSB, cData MSB 
+data = bus.read_i2c_block_data(0x38, 0x50, 8)
+ 
+# Convert the data
+red = data[1] * 256 + data[0]
+green = data[3] * 256 + data[2]
+blue = data[5] * 256 + data[4]
+cData = data[7] * 256 + data[6]
+ 
+# Output data to the screen
+print ("Red Color luminance : %d lux" %red)
+print ("Green Color luminance : %d lux" %green)
+print ("Blue Color luminance : %d lux" %blue)
+print ("Clear Data luminance : %d lux" %cData)
+#determine the colour and use voice to speak the name of the colour
+if red>90 and green<30 and blue<20:
+    print(“Red”)
+    speaking = pyttsx3.speak(“Red bin”)
+elif red>120 and green>120 and blue<50:
+    print(“Yellow”)
+    speaking = pyttsx3.speak(“Yellow bin”)
+elif red<70 and green>180 and blue<70:
+    print(“Green”)
+    speaking = pyttsx3.speak(“Green bin”)
+else:
+     print(“Not 1 of the 3 bin colours”)
+
